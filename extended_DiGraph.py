@@ -41,6 +41,10 @@ class DiGraph(nx.DiGraph):
         DG_normalized_sorted.add_edges_from(DG_normalized.edges(data=True))
         return DG_normalized_sorted
 
+    @property
+    def isophorm_hash(self):
+        return (sorted(d for n,d in self.out_degree), sorted(d for n,d in self.in_degree))
+
     def is_isomorphic(self, DG2):
         if nx.faster_could_be_isomorphic(self, DG2):
             return nx.is_isomorphic(self, DG2)

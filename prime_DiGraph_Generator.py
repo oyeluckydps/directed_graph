@@ -13,25 +13,25 @@ Nodes2_Prime1 = Nodes2_Prime1.normalize()
 def find_primes(DG, already_checked_cdg = None):
     if already_checked_cdg is None:
         already_checked_cdg = cdg.CollectionDiGraphs()
-    if already_checked_cdg.isomorphic_graph_exists(DG):
-        return ([], already_checked_cdg)
-    else:
-        already_checked_cdg.add_DGs([DG])
     if not DG.is_strongly_connected:
         return ([], already_checked_cdg)
+    # if already_checked_cdg.isomorphic_graph_exists(DG):
+    #     return ([], already_checked_cdg)
+    # else:
+    #     already_checked_cdg.add_DGs([DG])
     if DG.is_prime:
         return ([DG], already_checked_cdg)
-    edge_list = deepcopy(DG.edges)
+    edge_list = list(DG.edges)
     all_primes = []
     for edge in edge_list:
-        DG_temp = deepcopy(DG)
+        DG_temp = edg.DiGraph(DG)
         DG_temp.remove_edge(*edge)
         primes_for_this_edge_removal, already_checked_cdg = find_primes(DG_temp, already_checked_cdg)
         all_primes = all_primes + primes_for_this_edge_removal
     return (all_primes, already_checked_cdg)
 
 
-def add_a_node_all_possibilities(DG, all_DGs = None, check_isomorphism = True, check_primality = True, reduce_to_primes = True):
+def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphism = True, check_primality = True, reduce_to_primes = True):
     '''
     :param DG: Directed graph to which a node is to be added
     :param all_DGs: A CDG against which isomorphism is to be checked and results are added to this CDG.
@@ -40,28 +40,27 @@ def add_a_node_all_possibilities(DG, all_DGs = None, check_isomorphism = True, c
     :param reduce_to_primes: Reduce the DGs to their primes after formation if they are not prime.
     :return:
     '''
-    if all_DGs is None:
-        all_DGs = cdg.CollectionDiGraphs()
+    all_DGs = cdg.CollectionDiGraphs()
     num_nodes = DG.number_of_nodes()
     DG.add_node(num_nodes)
-    if reduce_to_primes:
+    if already_checked_cdg is None:
         already_checked_cdg = deepcopy(all_DGs)
     for in_edge_node in DG.nodes():
         for out_edge_node in DG.nodes():
-            DG_temp = deepcopy(DG)
+            DG_temp = edg.DiGraph(DG)
             DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
-            if check_isomorphism:
-                if all_DGs.isomorphic_graph_exists(DG_temp):
-                    continue
             if reduce_to_primes:
                 DG_reduced_to_primes, already_checked_cdg = find_primes(DG_temp, already_checked_cdg)
                 all_DGs.add_DGs(DG_reduced_to_primes)
                 continue
+            if check_isomorphism:
+                if all_DGs.isomorphic_graph_exists(DG_temp):
+                    continue
             if check_primality:
                 if not DG_temp.is_prime:
                     continue
             all_DGs.add_DGs([DG_temp])
-    return all_DGs
+    return all_DGs, already_checked_cdg
 
 
 class primeDiGraphGenerator():
@@ -95,10 +94,13 @@ class primeDiGraphGenerator():
         prime_to_compute = self.highest_prime_computed + 1
         highest_current_primes = self.cdg.list_of_highest_computed_primes(self.highest_prime_computed)
         next_primes = cdg.CollectionDiGraphs()
+        all_computed_isomorphs = cdg.CollectionDiGraphs()
         tot_highest_curr_primes = len(highest_current_primes)
         for i, a_highest_prime in enumerate(highest_current_primes):
-            print(str(i+1) + '/' + str(tot_highest_curr_primes))
-            next_primes = add_a_node_all_possibilities(a_highest_prime, next_primes, check_isomorphism=True, check_primality=True)
+            print(str(i+1) + '/' + str(tot_highest_curr_primes), end=':\t')
+            computed_primes, all_computed_isomorphs = add_a_node_all_possibilities(a_highest_prime, all_computed_isomorphs)
+            print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
+            next_primes.add_DGs(computed_primes.DGs, check_against_isomorphism=True)
         self.highest_prime_computed = prime_to_compute
-        self.cdg.add_DGs(list(next_primes.df.DiGraph))
+        self.cdg.add_DGs(next_primes.DGs)
         return next_primes

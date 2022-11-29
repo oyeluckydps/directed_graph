@@ -25,25 +25,31 @@ class CollectionDiGraphs():
         """
         self.name = name
         self.is_prime_collection = is_prime_collection
-        columns = ['number_of_nodes', 'number_of_edges', 'is_strongly_connected', 'is_prime', 'adj_', 'DiGraph']
-        self.df = pd.DataFrame(columns= columns)
+        self.DGs = []
+        self.number_of_nodes = []
+        self.DG_isophorm_hash = []
+
+    @property
+    def df(self):
+        '''
+        Make a df out of self.DGs here!
+        :return:
+        '''
+        df = pd.DataFrame(columns= ['number_of_nodes', 'number_of_edges', 'is_strongly_connected', 'is_prime', 'adj_', 'DiGraph'])
+        for (n_nodes, DG) in zip(self.number_of_nodes, self.DGs):
+            df.loc[len(df.index)] = [n_nodes, DG.number_of_edges(), DG.is_strongly_connected, DG.is_prime, DG.adj_, DG]
+        return df
 
     def add_DGs(self, DGs, normalize = False, check_against_isomorphism = False):
-        df = pd.DataFrame(columns = self.df.columns)
-        start_index = self.df.index[-1]+1 if len(self.df.index)>0 else 0
-        for index_offset, DG in enumerate(DGs):
+        for DG in DGs:
             if check_against_isomorphism:
-                for row in self.df.iterrows():
-                    if DG.is_isomrphic(row.DiGraph):
-                        raise ValueError('One of the DiGraphs is isomorphic to existing DG.')
-                for row in df.iterrows():
-                    if DG.is_isomrphic(row.DiGraph):
-                        raise ValueError('Two of the DiGraphs are isomorphic among themselves.')
+                if self.isomorphic_graph_exists(DG):
+                    continue
             if normalize:
                 DG = DG.normalize()
-            df.loc[start_index + index_offset] = [DG.number_of_nodes(), DG.number_of_edges(), \
-                                                  DG.is_strongly_connected, DG.is_prime, DG.adj_, DG]
-        self.df = pd.concat([self.df, df])
+            self.DGs.append(DG)
+            self.number_of_nodes.append(DG.number_of_nodes())
+            self.DG_isophorm_hash.append(DG.isophorm_hash)
 
     def find_row(self, query):
         df = self.df.query(query)
@@ -57,13 +63,13 @@ class CollectionDiGraphs():
 
     def list_of_highest_computed_primes(self, highest_num = None):
         if highest_num is None:
-            highest_num = max(self.df['number_of_nodes'])
-        indices, query_df = self.find_row('(number_of_nodes == ' + str(highest_num) + ') & (is_prime == ' + str(True) + ')')
-        return list(query_df.DiGraph)
+            highest_num = max(self.number_of_nodes)
+        return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==highest_num]
 
-    def isomorphic_graph_exists(self, DG):
-        for _, row in self.df.iterrows():
-            if DG.is_isomorphic(row.DiGraph):
+    def isomorphic_graph_exists(self, DG2):
+        DG2_hash = DG2.isophorm_hash
+        for (DG, DG_hash) in zip(self.DGs, self.DG_isophorm_hash):
+            if (DG2_hash==DG_hash) and DG.is_isomorphic(DG2):
                 return True
         return False
 

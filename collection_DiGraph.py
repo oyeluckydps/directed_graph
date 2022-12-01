@@ -38,6 +38,7 @@ class CollectionDiGraphs():
         self.DGs = []
         self.number_of_nodes = []
         self.DG_isophorm_hash = []
+        self.hash_dict = dict()
 
     @property
     def df(self):
@@ -59,7 +60,12 @@ class CollectionDiGraphs():
                 DG = DG.normalize()
             self.DGs.append(DG)
             self.number_of_nodes.append(DG.number_of_nodes())
-            self.DG_isophorm_hash.append(nx.weisfeiler_lehman_graph_hash(DG))
+            DG_hash = DG.isophorm_hash
+            self.DG_isophorm_hash.append(DG_hash)
+            if DG_hash in self.hash_dict.keys():
+                self.hash_dict[DG_hash].append(len(self.DGs)-1)
+            else:
+                self.hash_dict[DG_hash] = [len(self.DGs)-1]
 
     def find_row(self, query):
         df = self.df.query(query)
@@ -77,11 +83,10 @@ class CollectionDiGraphs():
         return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==highest_num]
 
     def isomorphic_graph_exists(self, DG2):
-        DG2_hash = nx.weisfeiler_lehman_graph_hash(DG2)
+        DG2_hash = DG2.isophorm_hash
         if DG2_hash in self.DG_isophorm_hash:
-            match_indices = indices(self.DG_isophorm_hash, DG2_hash)
-            for matching_index in match_indices:
-                if self.DGs[matching_index].is_isomorphic(DG2):
+            for index in self.hash_dict[DG2_hash]:
+                if DG2.is_isomorphic(self.DGs[index]):
                     return True
         return False
 

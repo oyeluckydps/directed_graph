@@ -61,10 +61,10 @@ def cdg_handling():
 
 def pdgg_handling():
     for i in range(3,25):
-        _6nodes = pdgg.primeDiGraphGenerator('using_isomorphic_hash')
+        _6nodes = pdgg.primeDiGraphGenerator('optimized_isomorphic_hash')
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
-        _6nodes.save_data('using_isomorphic_hash')
+        _6nodes.save_data('optimized_isomorphic_hash')
         del _6nodes
 
 
@@ -103,8 +103,8 @@ def weisfeiler_lehman_debug():
     for k, l in adj_list2.items():
         for e in l:
             EDG2.add_edge(k, e)
-    print(nx.weisfeiler_lehman_graph_hash(EDG1))
-    print(nx.weisfeiler_lehman_graph_hash(EDG2))
+    print(EDG1.isophorm_hash)
+    print(EDG2.isophorm_hash)
 
 if __name__ == '__main__':
     # edg_handling()

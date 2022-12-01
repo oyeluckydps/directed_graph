@@ -43,7 +43,9 @@ class DiGraph(nx.DiGraph):
 
     @property
     def isophorm_hash(self):
-        return (sorted(d for n,d in self.out_degree), sorted(d for n,d in self.in_degree))
+        out_in_attr = {node: self.out_degree(node) * self.number_of_nodes() + self.in_degree(node) for node in self.nodes}
+        nx.set_node_attributes(self, out_in_attr, 'in-out')
+        return nx.weisfeiler_lehman_graph_hash(self, node_attr='in-out')
 
     def is_isomorphic(self, DG2):
         return nx.is_isomorphic(self, DG2)

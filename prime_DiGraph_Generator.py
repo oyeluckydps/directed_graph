@@ -15,10 +15,10 @@ def find_primes(DG, already_checked_cdg = None):
         already_checked_cdg = cdg.CollectionDiGraphs()
     if not DG.is_strongly_connected:
         return ([], already_checked_cdg)
-    # if already_checked_cdg.isomorphic_graph_exists(DG):
-    #     return ([], already_checked_cdg)
-    # else:
-    #     already_checked_cdg.add_DGs([DG])
+    if already_checked_cdg.isomorphic_graph_exists(DG):
+        return ([], already_checked_cdg)
+    else:
+        already_checked_cdg.add_DGs([DG])
     if DG.is_prime:
         return ([DG], already_checked_cdg)
     edge_list = list(DG.edges)
@@ -42,7 +42,6 @@ def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphi
     '''
     all_DGs = cdg.CollectionDiGraphs()
     num_nodes = DG.number_of_nodes()
-    DG.add_node(num_nodes)
     if already_checked_cdg is None:
         already_checked_cdg = deepcopy(all_DGs)
     for in_edge_node in DG.nodes():
@@ -100,7 +99,7 @@ class primeDiGraphGenerator():
             print(str(i+1) + '/' + str(tot_highest_curr_primes), end=':\t')
             computed_primes, all_computed_isomorphs = add_a_node_all_possibilities(a_highest_prime, all_computed_isomorphs)
             print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
-            next_primes.add_DGs(computed_primes.DGs, check_against_isomorphism=True)
+            next_primes.add_DGs(computed_primes.DGs)
         self.highest_prime_computed = prime_to_compute
         self.cdg.add_DGs(next_primes.DGs)
         return next_primes

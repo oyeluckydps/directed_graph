@@ -61,10 +61,10 @@ def cdg_handling():
 
 def pdgg_handling():
     for i in range(3,25):
-        _6nodes = pdgg.primeDiGraphGenerator('all_primes_isomorphs_preserved')
+        _6nodes = pdgg.primeDiGraphGenerator('using_isomorphic_hash')
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
-        _6nodes.save_data('all_primes_isomorphs_preserved')
+        _6nodes.save_data('using_isomorphic_hash')
         del _6nodes
 
 
@@ -92,8 +92,23 @@ def add_a_node_testing():
     EDG1 = edg.DiGraph()
     EDG1.add_edges_from([[1, 2], [2, 3], [2, 4], [3, 1], [4, 1]])
 
+def weisfeiler_lehman_debug():
+    adj_list = {0: [2, 3], 1: [0], 2: [4], 3: [1], 4: [1, 5], 5: [2]}
+    EDG1 = edg.DiGraph()
+    for k, l in adj_list.items():
+        for e in l:
+            EDG1.add_edge(k, e)
+    adj_list2 = {0: [2, 3], 1: [4], 2: [0], 3: [1], 4: [1, 5], 5: [2]}
+    EDG2 = edg.DiGraph()
+    for k, l in adj_list2.items():
+        for e in l:
+            EDG2.add_edge(k, e)
+    print(nx.weisfeiler_lehman_graph_hash(EDG1))
+    print(nx.weisfeiler_lehman_graph_hash(EDG2))
+
 if __name__ == '__main__':
     # edg_handling()
     # cdg_handling()
     pdgg_handling()
     # find_prime_testing()
+    # weisfeiler_lehman_debug()

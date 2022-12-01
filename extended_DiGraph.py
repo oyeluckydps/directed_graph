@@ -46,10 +46,7 @@ class DiGraph(nx.DiGraph):
         return (sorted(d for n,d in self.out_degree), sorted(d for n,d in self.in_degree))
 
     def is_isomorphic(self, DG2):
-        if nx.faster_could_be_isomorphic(self, DG2):
-            return nx.is_isomorphic(self, DG2)
-        else:
-            return False
+        return nx.is_isomorphic(self, DG2)
 
     def _is_prime(self):
         edge_list = deepcopy(self.edges)

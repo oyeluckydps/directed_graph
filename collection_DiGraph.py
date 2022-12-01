@@ -6,6 +6,16 @@ import warnings
 
 import pandas as pd
 
+def indices(lst, element):
+    result = []
+    offset = -1
+    while True:
+        try:
+            offset = lst.index(element, offset+1)
+        except ValueError:
+            return result
+        result.append(offset)
+
 def load_object(filename, number_of_objects = 1):
     if number_of_objects == 1:
         with open(filename+'._pickle', 'rb') as inp:
@@ -35,9 +45,9 @@ class CollectionDiGraphs():
         Make a df out of self.DGs here!
         :return:
         '''
-        df = pd.DataFrame(columns= ['number_of_nodes', 'number_of_edges', 'is_strongly_connected', 'is_prime', 'adj_', 'DiGraph'])
-        for (n_nodes, DG) in zip(self.number_of_nodes, self.DGs):
-            df.loc[len(df.index)] = [n_nodes, DG.number_of_edges(), DG.is_strongly_connected, DG.is_prime, DG.adj_, DG]
+        df = pd.DataFrame(columns= ['isomorphic_hash', 'number_of_nodes', 'number_of_edges', 'is_strongly_connected', 'is_prime', 'adj_', 'DiGraph'])
+        for (hash, n_nodes, DG) in zip(self.DG_isophorm_hash, self.number_of_nodes, self.DGs):
+            df.loc[len(df.index)] = [hash, n_nodes, DG.number_of_edges(), DG.is_strongly_connected, DG.is_prime, DG.adj_, DG]
         return df
 
     def add_DGs(self, DGs, normalize = False, check_against_isomorphism = False):
@@ -49,7 +59,7 @@ class CollectionDiGraphs():
                 DG = DG.normalize()
             self.DGs.append(DG)
             self.number_of_nodes.append(DG.number_of_nodes())
-            self.DG_isophorm_hash.append(DG.isophorm_hash)
+            self.DG_isophorm_hash.append(nx.weisfeiler_lehman_graph_hash(DG))
 
     def find_row(self, query):
         df = self.df.query(query)
@@ -67,10 +77,12 @@ class CollectionDiGraphs():
         return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==highest_num]
 
     def isomorphic_graph_exists(self, DG2):
-        DG2_hash = DG2.isophorm_hash
-        for (DG, DG_hash) in zip(self.DGs, self.DG_isophorm_hash):
-            if (DG2_hash==DG_hash) and DG.is_isomorphic(DG2):
-                return True
+        DG2_hash = nx.weisfeiler_lehman_graph_hash(DG2)
+        if DG2_hash in self.DG_isophorm_hash:
+            match_indices = indices(self.DG_isophorm_hash, DG2_hash)
+            for matching_index in match_indices:
+                if self.DGs[matching_index].is_isomorphic(DG2):
+                    return True
         return False
 
     def save_object(self, filename):

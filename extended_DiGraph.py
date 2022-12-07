@@ -41,11 +41,14 @@ class DiGraph(nx.DiGraph):
         DG_normalized_sorted.add_edges_from(DG_normalized.edges(data=True))
         return DG_normalized_sorted
 
+    @property
+    def isophorm_hash(self):
+        out_in_attr = {node: self.out_degree(node) * self.number_of_nodes() + self.in_degree(node) for node in self.nodes}
+        nx.set_node_attributes(self, out_in_attr, 'in-out')
+        return nx.weisfeiler_lehman_graph_hash(self, node_attr='in-out')
+
     def is_isomorphic(self, DG2):
-        if nx.faster_could_be_isomorphic(self, DG2):
-            return nx.is_isomorphic(self, DG2)
-        else:
-            return False
+        return nx.is_isomorphic(self, DG2)
 
     def _is_prime(self):
         edge_list = deepcopy(self.edges)

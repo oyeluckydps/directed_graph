@@ -42,7 +42,7 @@ def cdg_handling():
     Nodes2_Prime1.add_edges_from([[1, 2], [2, 1]])
     print(Nodes2_Prime1.is_strongly_connected)
     CDG2_prime.add_DGs([Nodes2_Prime1], normalize=True)
-    print(CDG2_prime.df)
+    print(CDG2_prime.DGs)
 
     Nodes3_Prime1 = edg.DiGraph()
     Nodes3_Prime2 = edg.DiGraph()
@@ -51,26 +51,41 @@ def cdg_handling():
     CDG3_prime_all = CDG2_prime
     CDG3_prime_all.name = 'all_primes_till_3nodes'
     CDG3_prime_all.add_DGs([Nodes3_Prime1, Nodes3_Prime2], normalize=True)
-    print(CDG3_prime_all.df)
+    print(CDG3_prime_all.DGs)
     CDG3_prime_all_filename = 'CDG3_prime_all'
     CDG3_prime_all.save_object(CDG3_prime_all_filename)
 
     del CDG3_prime_all
     CDG3_prime_all_reloaded = cdg.load_object(filename=CDG3_prime_all_filename)
-    print(CDG3_prime_all_reloaded.df)
+    print(CDG3_prime_all_reloaded.DGs)
 
 def pdgg_handling():
     for i in range(3,25):
-        _6nodes = pdgg.primeDiGraphGenerator('all_primes')
+        _6nodes = pdgg.primeDiGraphGenerator('optimized_isomorphic_hash')
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
-        _6nodes.save_data('all_primes')
+        _6nodes.save_data('optimized_isomorphic_hash')
         del _6nodes
 
+def optimized_pdgg_handling():
+    for i in range(3, 25):
+        _12nodes = pdgg.primeDiGraphGenerator('least_computation')
+        print('Computing for ' + str(i) + ' nodes.')
+        best_combo = _12nodes.optimized_combo_for_next_prime_computation()
+        _12nodes.compute_next_primes_optimized(*best_combo)
+        _12nodes.save_data('least_computation')
+        del _12nodes
 
 def find_prime_testing():
     EDG1 = edg.DiGraph()
-    EDG1.add_edges_from([[1, 2], [2, 3], [2, 4], [3, 1], [4, 1], [4, 2], [4, 3]])
+    a = []
+    for i in range(5):
+        for j in range(5):
+            if i == j:
+                continue
+            else:
+                a.append((i, j))
+    EDG1.add_edges_from(a)
     (all_primes, checked_DGs) = pdgg.find_primes(EDG1)
     print('Printing the Graph in question.')
     print(EDG1)
@@ -78,15 +93,31 @@ def find_prime_testing():
     for prime in all_primes:
         print(prime)
     print('Printing all the graphs that were checked!')
-    for DG in list(checked_DGs.df.DiGraph):
+    for DG in list(checked_DGs.DGs):
         print(DG)
 
 def add_a_node_testing():
     EDG1 = edg.DiGraph()
     EDG1.add_edges_from([[1, 2], [2, 3], [2, 4], [3, 1], [4, 1]])
 
+def weisfeiler_lehman_debug():
+    adj_list = {0: [2, 3], 1: [0], 2: [4], 3: [1], 4: [1, 5], 5: [2]}
+    EDG1 = edg.DiGraph()
+    for k, l in adj_list.items():
+        for e in l:
+            EDG1.add_edge(k, e)
+    adj_list2 = {0: [2, 3], 1: [4], 2: [0], 3: [1], 4: [1, 5], 5: [2]}
+    EDG2 = edg.DiGraph()
+    for k, l in adj_list2.items():
+        for e in l:
+            EDG2.add_edge(k, e)
+    print(EDG1.isophorm_hash)
+    print(EDG2.isophorm_hash)
+
 if __name__ == '__main__':
     # edg_handling()
     # cdg_handling()
-    pdgg_handling()
+    # pdgg_handling()
     # find_prime_testing()
+    # weisfeiler_lehman_debug()
+    optimized_pdgg_handling()

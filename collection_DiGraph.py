@@ -77,10 +77,15 @@ class CollectionDiGraphs():
         else:
             return (df.index[0], df)
 
-    def list_of_highest_computed_primes(self, highest_num = None):
-        if highest_num is None:
-            highest_num = max(self.number_of_nodes)
-        return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==highest_num]
+    def list_of_computed_primes(self, num = None):
+        if num is None:
+            num = max(self.number_of_nodes)
+        return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==num]
+
+    def size_of_computed_primes(self, num = None):
+        if num is None:
+            num = max(self.number_of_nodes)
+        return self.number_of_nodes.count(num)
 
     def isomorphic_graph_exists(self, DG2):
         DG2_hash = DG2.isophorm_hash

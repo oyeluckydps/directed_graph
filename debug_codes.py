@@ -67,6 +67,14 @@ def pdgg_handling():
         _6nodes.save_data('optimized_isomorphic_hash')
         del _6nodes
 
+def optimized_pdgg_handling():
+    for i in range(3, 25):
+        _12nodes = pdgg.primeDiGraphGenerator('least_computation')
+        print('Computing for ' + str(i) + ' nodes.')
+        best_combo = _12nodes.optimized_combo_for_next_prime_computation()
+        _12nodes.compute_next_primes_optimized(*best_combo)
+        _12nodes.save_data('least_computation')
+        del _12nodes
 
 def find_prime_testing():
     EDG1 = edg.DiGraph()
@@ -109,6 +117,7 @@ def weisfeiler_lehman_debug():
 if __name__ == '__main__':
     # edg_handling()
     # cdg_handling()
-    pdgg_handling()
+    # pdgg_handling()
     # find_prime_testing()
     # weisfeiler_lehman_debug()
+    optimized_pdgg_handling()

@@ -130,7 +130,7 @@ class primeDiGraphGenerator():
 
     def compute_next_primes(self):
         prime_to_compute = self.highest_prime_computed + 1
-        highest_current_primes = self.cdg.list_of_computed_primes(self.highest_prime_computed)
+        highest_current_primes = self.cdg.list_of_computed_DGs(self.highest_prime_computed)
         next_primes = cdg.CollectionDiGraphs()
         all_computed_isomorphs = cdg.CollectionDiGraphs()
         tot_highest_curr_primes = len(highest_current_primes)
@@ -150,11 +150,11 @@ class primeDiGraphGenerator():
         '''
         current_highest_computed = self.highest_prime_computed
         prime_to_compute = current_highest_computed
-        computations_req = {(1,current_highest_computed): self.cdg.size_of_computed_primes(current_highest_computed)*(current_highest_computed**2)}
+        computations_req = {(1,current_highest_computed): self.cdg.count_of_computed_DGs(current_highest_computed)*(current_highest_computed**2)}
         for smaller_nexus in range(2, prime_to_compute//2+1):
             larger_nexus = prime_to_compute-smaller_nexus
             computations_req[(smaller_nexus,larger_nexus)] = smaller_nexus*smaller_nexus*larger_nexus*larger_nexus* \
-                    self.cdg.size_of_computed_primes(smaller_nexus)*self.cdg.size_of_computed_primes(larger_nexus)
+                    self.cdg.count_of_computed_DGs(smaller_nexus)*self.cdg.count_of_computed_DGs(larger_nexus)
         print(computations_req)
         min_combo = min(computations_req, key=computations_req.get)
         print("Minimum computation required for: ", min_combo)
@@ -164,8 +164,8 @@ class primeDiGraphGenerator():
         if lower_nexus_n is 1:
             return self.compute_next_primes()
         prime_to_compute = self.highest_prime_computed + 1
-        lower_nexus = self.cdg.list_of_computed_primes(lower_nexus_n)
-        higher_nexus = self.cdg.list_of_computed_primes(higher_nexus_n)
+        lower_nexus = self.cdg.list_of_computed_DGs(lower_nexus_n)
+        higher_nexus = self.cdg.list_of_computed_DGs(higher_nexus_n)
         next_primes = cdg.CollectionDiGraphs()
         all_computed_isomorphs = cdg.CollectionDiGraphs()
         l_h_nexus = product(lower_nexus, higher_nexus)

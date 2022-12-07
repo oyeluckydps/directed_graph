@@ -77,12 +77,12 @@ class CollectionDiGraphs():
         else:
             return (df.index[0], df)
 
-    def list_of_computed_primes(self, num = None):
+    def list_of_computed_DGs(self, num = None):
         if num is None:
             num = max(self.number_of_nodes)
         return [DG for DG, n_nodes in zip(self.DGs, self.number_of_nodes) if n_nodes==num]
 
-    def size_of_computed_primes(self, num = None):
+    def count_of_computed_DGs(self, num = None):
         if num is None:
             num = max(self.number_of_nodes)
         return self.number_of_nodes.count(num)

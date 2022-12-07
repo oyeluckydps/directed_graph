@@ -8,6 +8,7 @@ Note that isomorphic graphs are pruned at each step.
 - Generate a random directed strongly connected graph of given nodes. This is helpful in generation of strongly connected DGs for higher number of nodes e.g. 20-50. It helps in testing graph algorithms and systems with higher number of nodes where it is difficult to find all possible prime isomorphs.
 
 # File Description
+
 ### extended_DiGraph (edg)
 An enhancement over the DiGraph class of networkx that lets us do following in simplified manner:
 
@@ -30,7 +31,7 @@ A class that is helpful in preserving a collection of edg. It helps in saving th
 <b>Mehods</b>
 1. add_DG: Add a directed graph to the collection.
 2. list_of_computed_DGS: List all the DGs in collection for a given number of nodes.
-3. size_of_computed_DGs: Tells the count of DGs in collection for a given number of ndoes.
+3. count_of_computed_DGs: Tells the number of DGs in collection for a given number of nodes.
 4. isomorphic_graph_exists: Returns True if the DG passed in argument is isomorphic to any of the DGs in collection.
 5. save_object: Save the collection in .PICKLE format.
 

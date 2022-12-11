@@ -1,11 +1,12 @@
 import networkx as nx
+import _pickle as pickle
+from copy import deepcopy
+from itertools import product
+from path import Path
 
 import extended_DiGraph as edg
 import collection_DiGraph as cdg
 
-import _pickle as pickle
-from copy import deepcopy
-from itertools import product
 
 Nodes2_Prime1 = edg.DiGraph()
 Nodes2_Prime1.add_edges_from([[1, 2], [2, 1]])
@@ -102,10 +103,11 @@ def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg = N
 
 
 class primeDiGraphGenerator():
-    def __init__(self, name):
+    def __init__(self, name, path_prefix = ''):
+        self.path_prefix = path_prefix
         self.name = name
         try:
-            with open(self.name + '._pickle', 'rb') as inp:
+            with open(Path(path_prefix) / Path(self.name + '._pickle'), 'rb') as inp:
                 self.saved_data_filename = pickle.load(inp)
                 self.highest_prime_computed = pickle.load(inp)
         except FileNotFoundError:
@@ -115,15 +117,15 @@ class primeDiGraphGenerator():
             self.highest_prime_computed = 2
         if self.saved_data_filename is not None:
             try:
-                with open(self.saved_data_filename + 'CDG._pickle', 'rb') as inp:
+                with open(Path(path_prefix) / Path(self.saved_data_filename + 'CDG._pickle'), 'rb') as inp:
                     self.cdg = pickle.load(inp)
             except:
                 raise('Error in loading data!')
 
 
-    def save_data(self, cdg_filename):
-        with open(self.name+'._pickle', 'wb') as outp:
-            self.cdg.save_object(cdg_filename+'CDG')
+    def save_data(self, cdg_filename, path_prefix = ''):
+        self.cdg.save_object(cdg_filename + 'CDG', path_prefix=path_prefix)
+        with open(Path(path_prefix)/Path(self.name+'._pickle'), 'wb') as outp:
             pickle.dump(cdg_filename, outp, 0)
             pickle.dump(self.highest_prime_computed, outp, 0)
 
@@ -161,7 +163,7 @@ class primeDiGraphGenerator():
         return min_combo
 
     def compute_next_primes_optimized(self, lower_nexus_n, higher_nexus_n):
-        if lower_nexus_n is 1:
+        if lower_nexus_n == 1:
             return self.compute_next_primes()
         prime_to_compute = self.highest_prime_computed + 1
         lower_nexus = self.cdg.list_of_computed_DGs(lower_nexus_n)

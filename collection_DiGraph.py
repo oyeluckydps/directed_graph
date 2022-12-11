@@ -1,10 +1,10 @@
 import networkx as nx
-import extended_DiGraph as edg
-
 import _pickle as pickle
 import warnings
-
 import pandas as pd
+import path as Path
+
+import extended_DiGraph as edg
 
 def indices(lst, element):
     result = []
@@ -95,7 +95,7 @@ class CollectionDiGraphs():
                     return True
         return False
 
-    def save_object(self, filename):
-        with open(filename+'._pickle', 'wb') as outp:
+    def save_object(self, filename, path_prefix = ''):
+        with open(Path(path_prefix) / Path(filename+'._pickle'), 'wb') as outp:
             pickle.dump(self, outp, -1)
         self.df.to_csv(filename+'.csv')

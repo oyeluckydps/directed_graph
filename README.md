@@ -1,5 +1,6 @@
 # directed_graph
 A tool to generate and experiment with directed graphs. It is built over networkx by enhancing its features.
+- Kindly refer to random_strongly_connected_digraphs.pptx for detailed description and explanation.
 
 ## Two of the prime objectives of this tool are:
 - Generate all possible prime directed graphs for a given number of nodes. A prime DG refers to a DG to which is strongly connected and if any edge from the given graph is removed it no longer remains strongly connected.

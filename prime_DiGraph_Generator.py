@@ -2,7 +2,7 @@ import networkx as nx
 import _pickle as pickle
 from copy import deepcopy
 from itertools import product
-from path import Path
+from pathlib import Path
 
 import extended_DiGraph as edg
 import collection_DiGraph as cdg

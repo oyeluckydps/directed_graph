@@ -2,7 +2,7 @@ import networkx as nx
 import _pickle as pickle
 import warnings
 import pandas as pd
-import path as Path
+from pathlib import Path
 
 import extended_DiGraph as edg
 

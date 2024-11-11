@@ -1,6 +1,5 @@
 import networkx as nx
 from itertools import product
-
 import extended_DiGraph as edg
 import collection_DiGraph as cdg
 

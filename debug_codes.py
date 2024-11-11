@@ -4,6 +4,7 @@ import extended_DiGraph as edg
 import collection_DiGraph as cdg
 import prime_DiGraph_Generator as pdgg
 
+
 def edg_handling():
     EDG1 = edg.DiGraph()
     EDG1.add_edges_from([[1,2], [2,3], [2,4], [3,1], [4,1]])
@@ -96,6 +97,20 @@ def find_prime_testing():
     for DG in list(checked_DGs.DGs):
         print(DG)
 
+
+def find_prime_testing_ppt():
+    EDG1 = edg.DiGraph()
+    EDG1.add_edges_from([(0,1), (0,3), (1,2), (1,3), (2,0), (3,1), (3,2)])
+    (all_primes, checked_DGs) = pdgg.find_primes(EDG1)
+    print('Printing the Graph in question.')
+    print(EDG1)
+    print('Printing all the primes of the given graph')
+    for prime in all_primes:
+        print(prime)
+    print('Printing all the graphs that were checked!')
+    for DG in list(checked_DGs.DGs):
+        print(DG)
+
 def add_a_node_testing():
     EDG1 = edg.DiGraph()
     EDG1.add_edges_from([[1, 2], [2, 3], [2, 4], [3, 1], [4, 1]])
@@ -117,7 +132,8 @@ def weisfeiler_lehman_debug():
 if __name__ == '__main__':
     # edg_handling()
     # cdg_handling()
-    # pdgg_handling()
+    pdgg_handling()
     # find_prime_testing()
     # weisfeiler_lehman_debug()
-    optimized_pdgg_handling()
+    # optimized_pdgg_handling()
+    # find_prime_testing_ppt()

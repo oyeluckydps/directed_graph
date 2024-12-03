@@ -4,6 +4,8 @@ from copy import deepcopy
 from itertools import product
 from pathlib import Path
 
+import networkx.exception
+
 import extended_DiGraph as edg
 import collection_DiGraph as cdg
 
@@ -61,6 +63,37 @@ def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphi
                 if not DG_temp.is_prime:
                     continue
             all_DGs.add_DGs([DG_temp])
+    return all_DGs, already_checked_cdg
+
+
+def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism = True):
+    '''
+    :param DG: Directed graph to which a node is to be added
+    :param all_DGs: A CDG against which isomorphism is to be checked and results are added to this CDG.
+    :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
+    :return:
+    '''
+    all_DGs = cdg.CollectionDiGraphs()
+    num_nodes = DG.number_of_nodes()
+    if already_checked_cdg is None:
+        already_checked_cdg = cdg.CollectionDiGraphs()
+    for in_edge_node in DG.nodes():
+        for out_edge_node in DG.nodes():
+            DG_temp = edg.DiGraph(DG)
+            to_check_DGs = [DG_temp]
+            DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
+            DG_temp2 = edg.DiGraph(DG_temp)
+            if DG_temp2.has_edge(in_edge_node, out_edge_node):
+                DG_temp2.remove_edge(in_edge_node, out_edge_node)
+                to_check_DGs.append(DG_temp2)
+            for _DG in to_check_DGs:
+                if check_isomorphism:
+                    if already_checked_cdg.isomorphic_graph_exists(_DG):
+                        continue
+                already_checked_cdg.add_DGs([_DG])
+                if not _DG.is_prime:
+                    continue
+                all_DGs.add_DGs([_DG])
     return all_DGs, already_checked_cdg
 
 
@@ -138,7 +171,7 @@ class primeDiGraphGenerator():
         tot_highest_curr_primes = len(highest_current_primes)
         for i, a_highest_prime in enumerate(highest_current_primes):
             print(str(i+1) + '/' + str(tot_highest_curr_primes), end=':\t')
-            computed_primes, all_computed_isomorphs = add_a_node_all_possibilities(a_highest_prime, all_computed_isomorphs)
+            computed_primes, all_computed_isomorphs = optimized_prime_extension(a_highest_prime, all_computed_isomorphs)
             print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
             next_primes.add_DGs(computed_primes.DGs)
         self.highest_prime_computed = prime_to_compute

@@ -61,11 +61,11 @@ def cdg_handling():
     print(CDG3_prime_all_reloaded.DGs)
 
 def pdgg_handling():
-    for i in range(3,25):
-        _6nodes = pdgg.primeDiGraphGenerator('optimized_isomorphic_hash')
+    for i in range(3,10):
+        _6nodes = pdgg.primeDiGraphGenerator('wo_reduced_prime')
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
-        _6nodes.save_data('optimized_isomorphic_hash')
+        _6nodes.save_data('wo_reduced_prime')
         del _6nodes
 
 def optimized_pdgg_handling():

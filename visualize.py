@@ -9,7 +9,7 @@ import networkx as nx
 import json
 
 # Load DataFrame
-filename = 'optimized_isomorphic_hash'
+filename = 'wo_reduced_prime'
 with open(Path(filename + 'CDG._pickle'), 'rb') as inp:
     cdg = pickle.load(inp)
 

@@ -1,16 +1,5 @@
-import pickle
-from pathlib import Path
-import dash
-from dash import html, dcc, callback, Output, Input, State, page_registry, page_container
-import dash_cytoscape as cyto
-import pandas as pd
 import networkx as nx
-import json
-from ast import literal_eval
 
-app = dash.Dash(__name__, use_pages=True)
-
-# Shared stylesheet for consistent graph appearance
 graph_stylesheet = [
     {
         'selector': 'node',
@@ -38,12 +27,6 @@ graph_stylesheet = [
     }
 ]
 
-# Home page (index.py)
-app.layout = html.Div([
-    page_container
-])
-
-# Function to generate graph elements (shared between pages)
 def generate_elements_from_graph(G):
     try:
         pos = nx.spring_layout(G, seed=42) if len(G.nodes) > 0 else {}
@@ -61,9 +44,3 @@ def generate_elements_from_graph(G):
     except Exception as e:
         print(f"Error constructing graph: {e}")
         return []
-
-# Pages directory
-import pages
-
-if __name__ == '__main__':
-    app.run_server(debug=True)

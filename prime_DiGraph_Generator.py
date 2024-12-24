@@ -80,13 +80,20 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
     for in_edge_node in DG.nodes():
         for out_edge_node in DG.nodes():
             DG_temp = edg.DiGraph(DG)
-            to_check_DGs = [DG_temp]
             DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
             DG_temp2 = edg.DiGraph(DG_temp)
-            if DG_temp2.has_edge(in_edge_node, out_edge_node):
+            if DG_temp2.has_edge(in_edge_node, out_edge_node):      # Either the added node is connected to a
+                # single preexisting node of a prime graph or an edge is bifurcated to add a new node.
                 DG_temp2.remove_edge(in_edge_node, out_edge_node)
-                to_check_DGs.append(DG_temp2)
-            for _DG in to_check_DGs:
+                _DG = DG_temp2
+                if check_isomorphism:
+                    if already_checked_cdg.isomorphic_graph_exists(_DG):
+                        continue
+                already_checked_cdg.add_DGs([_DG])
+                # No need to check for primality as it will definitely be a prime.
+                all_DGs.add_DGs([_DG])
+            else:
+                _DG = DG_temp
                 if check_isomorphism:
                     if already_checked_cdg.isomorphic_graph_exists(_DG):
                         continue

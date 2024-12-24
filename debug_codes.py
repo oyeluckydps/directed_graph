@@ -62,7 +62,7 @@ def cdg_handling():
 
 def pdgg_handling():
     for i in range(3,10):
-        _6nodes = pdgg.primeDiGraphGenerator('wo_reduced_prime')
+        _6nodes = pdgg.primeDiGraphGenerator('wo_reduced_prime_optimized')
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
         _6nodes.save_data('wo_reduced_prime')

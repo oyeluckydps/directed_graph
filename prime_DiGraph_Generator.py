@@ -98,9 +98,11 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
                     if already_checked_cdg.isomorphic_graph_exists(_DG):
                         continue
                 already_checked_cdg.add_DGs([_DG])
-                if not _DG.is_prime:
-                    continue
-                all_DGs.add_DGs([_DG])
+                if in_edge_node == out_edge_node:
+                    all_DGs.add_DGs([_DG])
+                elif _DG.is_prime:
+                    all_DGs.add_DGs([_DG])
+
     return all_DGs, already_checked_cdg
 
 

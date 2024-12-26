@@ -1,4 +1,31 @@
 import networkx as nx
+import pathlib
+import ast
+import pprint
+import time
+from contextlib import contextmanager
+
+def read_data(filename):
+    text_on_file = pathlib.Path(filename).read_text()
+    return ast.literal_eval(text_on_file)
+
+def save_data(data, filename, mode = 'w'):
+    with open(pathlib.Path(filename), mode=mode) as f:
+        pprint.pprint(data, f)
+
+
+@contextmanager
+def time_block(label):
+    """Context manager to time a specific block of code."""
+    start_time = time.time()
+    yield
+    end_time = time.time()
+    time_taken = end_time - start_time
+    if label not in time_block.timings:
+        time_block.timings[label] = []
+    time_block.timings[label].append(time_taken)
+
+time_block.timings = {}
 
 graph_stylesheet = [
     {

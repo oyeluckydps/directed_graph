@@ -5,6 +5,7 @@ import pandas as pd
 from pathlib import Path
 
 import extended_DiGraph as edg
+from utils import time_block
 
 def indices(lst, element):
     result = []
@@ -88,8 +89,11 @@ class CollectionDiGraphs():
         return self.number_of_nodes.count(num)
 
     def isomorphic_graph_exists(self, DG2):
-        DG2_hash = DG2.isophorm_hash
-        if DG2_hash in self.DG_isophorm_hash:
+        with time_block("isomorphic_graph_exists: Calculating Hash"):
+            DG2_hash = DG2.isophorm_hash
+        with time_block("isomorphic_graph_exists: Hash exists in list"):
+           flag1 = DG2_hash in self.hash_dict.keys()
+        if flag1:
             for index in self.hash_dict[DG2_hash]:
                 if DG2.is_isomorphic(self.DGs[index]):
                     return True

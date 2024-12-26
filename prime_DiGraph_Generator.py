@@ -4,15 +4,17 @@ from copy import deepcopy
 from itertools import product
 from pathlib import Path
 
-import networkx.exception
-
 import extended_DiGraph as edg
 import collection_DiGraph as cdg
-
+from utils import time_block
 
 Nodes2_Prime1 = edg.DiGraph()
 Nodes2_Prime1.add_edges_from([[1, 2], [2, 1]])
 Nodes2_Prime1 = Nodes2_Prime1.normalize()
+
+
+
+
 
 def find_primes(DG, already_checked_cdg = None):
     if already_checked_cdg is None:
@@ -38,7 +40,6 @@ def find_primes(DG, already_checked_cdg = None):
 def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphism = True, check_primality = True, reduce_to_primes = True):
     '''
     :param DG: Directed graph to which a node is to be added
-    :param all_DGs: A CDG against which isomorphism is to be checked and results are added to this CDG.
     :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
     :param check_primality: Check if the newly generated DG is prime.
     :param reduce_to_primes: Reduce the DGs to their primes after formation if they are not prime.
@@ -69,7 +70,6 @@ def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphi
 def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism = True):
     '''
     :param DG: Directed graph to which a node is to be added
-    :param all_DGs: A CDG against which isomorphism is to be checked and results are added to this CDG.
     :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
     :return:
     '''
@@ -79,30 +79,30 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
         already_checked_cdg = cdg.CollectionDiGraphs()
     for in_edge_node in DG.nodes():
         for out_edge_node in DG.nodes():
-            DG_temp = edg.DiGraph(DG)
-            DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
-            DG_temp2 = edg.DiGraph(DG_temp)
-            if DG_temp2.has_edge(in_edge_node, out_edge_node):      # Either the added node is connected to a
-                # single preexisting node of a prime graph or an edge is bifurcated to add a new node.
-                DG_temp2.remove_edge(in_edge_node, out_edge_node)
-                _DG = DG_temp2
+            with time_block("optimized_prime_extension: Preparation"):
+                DG_temp = edg.DiGraph(DG)
+                DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
+            if DG_temp.has_edge(in_edge_node, out_edge_node):      # An edge is bifurcated to add a new node.
+                DG_temp.remove_edge(in_edge_node, out_edge_node)
                 if check_isomorphism:
-                    if already_checked_cdg.isomorphic_graph_exists(_DG):
+                    if already_checked_cdg.isomorphic_graph_exists(DG_temp):
                         continue
-                already_checked_cdg.add_DGs([_DG])
+                already_checked_cdg.add_DGs([DG_temp])
                 # No need to check for primality as it will definitely be a prime.
-                all_DGs.add_DGs([_DG])
+                all_DGs.add_DGs([DG_temp])
             else:
-                _DG = DG_temp
-                if check_isomorphism:
-                    if already_checked_cdg.isomorphic_graph_exists(_DG):
-                        continue
-                already_checked_cdg.add_DGs([_DG])
-                if in_edge_node == out_edge_node:
-                    all_DGs.add_DGs([_DG])
-                elif _DG.is_prime:
-                    all_DGs.add_DGs([_DG])
-
+                with time_block("optimized_prime_extension: Check Isomorphism"):
+                    if check_isomorphism:
+                        if already_checked_cdg.isomorphic_graph_exists(DG_temp):
+                            continue
+                with time_block("optimized_prime_extension: Adding to already_checked_DG"):
+                    already_checked_cdg.add_DGs([DG_temp])
+                flag1 = (in_edge_node == out_edge_node)
+                with time_block("optimized_prime_extension: Checking primality"):
+                    flag2 = DG_temp.is_prime
+                if flag1 or flag2:
+                    with time_block("optimized_prime_extension: Adding to the primes collection"):
+                        all_DGs.add_DGs([DG_temp])
     return all_DGs, already_checked_cdg
 
 
@@ -110,7 +110,6 @@ def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg = N
     '''
     :param lower_DG: A Directed graph
     :param higher_DG: Another Directed graph
-    :param all_DGs: A CDG against which isomorphism is to be checked and results are added to this CDG.
     :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
     :param check_primality: Check if the newly generated DG is prime.
     :param reduce_to_primes: Reduce the DGs to their primes after formation if they are not prime.
@@ -180,12 +179,13 @@ class primeDiGraphGenerator():
         tot_highest_curr_primes = len(highest_current_primes)
         for i, a_highest_prime in enumerate(highest_current_primes):
             print(str(i+1) + '/' + str(tot_highest_curr_primes), end=':\t')
-            computed_primes, all_computed_isomorphs = optimized_prime_extension(a_highest_prime, all_computed_isomorphs)
+            with time_block("compute_next_prime: "):
+                computed_primes, all_computed_isomorphs = optimized_prime_extension(a_highest_prime, all_computed_isomorphs)
             print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
             next_primes.add_DGs(computed_primes.DGs)
         self.highest_prime_computed = prime_to_compute
         self.cdg.add_DGs(next_primes.DGs)
-        return next_primes
+        return all_computed_isomorphs, next_primes
 
     def optimized_combo_for_next_prime_computation(self):
         '''

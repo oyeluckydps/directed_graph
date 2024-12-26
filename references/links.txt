@@ -1,0 +1,1 @@
+https://cs.stackexchange.com/questions/29552/enumerate-all-non-isomorphic-graphs-of-a-certain-size

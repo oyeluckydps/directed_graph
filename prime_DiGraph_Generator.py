@@ -1,5 +1,5 @@
 import networkx as nx
-import _pickle as pickle
+import pickle
 from copy import deepcopy
 from itertools import product
 from pathlib import Path
@@ -84,17 +84,15 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
                 DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
             if DG_temp.has_edge(in_edge_node, out_edge_node):      # An edge is bifurcated to add a new node.
                 DG_temp.remove_edge(in_edge_node, out_edge_node)
-                if check_isomorphism:
-                    if already_checked_cdg.isomorphic_graph_exists(DG_temp):
-                        continue
+                if check_isomorphism and already_checked_cdg.isomorphic_graph_exists(DG_temp):
+                    continue
                 already_checked_cdg.add_DGs([DG_temp])
                 # No need to check for primality as it will definitely be a prime.
                 all_DGs.add_DGs([DG_temp])
             else:
                 with time_block("optimized_prime_extension: Check Isomorphism"):
-                    if check_isomorphism:
-                        if already_checked_cdg.isomorphic_graph_exists(DG_temp):
-                            continue
+                    if check_isomorphism and already_checked_cdg.isomorphic_graph_exists(DG_temp):
+                        continue
                 with time_block("optimized_prime_extension: Adding to already_checked_DG"):
                     already_checked_cdg.add_DGs([DG_temp])
                 flag1 = (in_edge_node == out_edge_node)
@@ -167,8 +165,8 @@ class primeDiGraphGenerator():
     def save_data(self, cdg_filename, path_prefix = ''):
         self.cdg.save_object(cdg_filename + 'CDG', path_prefix=path_prefix)
         with open(Path(path_prefix)/Path(self.name+'._pickle'), 'wb') as outp:
-            pickle.dump(cdg_filename, outp, 0)
-            pickle.dump(self.highest_prime_computed, outp, 0)
+            pickle.dump(cdg_filename, outp, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.highest_prime_computed, outp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
     def compute_next_primes(self):

@@ -63,14 +63,14 @@ def cdg_handling():
     print(CDG3_prime_all_reloaded.DGs)
 
 def pdgg_handling():
-    filename = 'timing3'
-    for i in range(3,11):
+    filename = 'consolidated'
+    for i in range(3,16):
         _6nodes = pdgg.primeDiGraphGenerator(filename)
         print('Computing for ' + str(i) + ' nodes.')
         _6nodes.compute_next_primes()
         # all_encountered_digraphs, all_primes = _6nodes.compute_next_primes()
         # all_encountered_digraphs.save_object(filename=filename+f'_ALL_{i}_nodes')
-        utils.save_data(utils.time_block.timings, filename=filename+f'_TIMING_LOG_{i}_nodes.txt')
+        # utils.save_data(utils.time_block.timings, filename=filename+f'_TIMING_LOG_{i}_nodes.txt')
         utils.time_block.timings = {}
         _6nodes.save_data(filename)
         del _6nodes

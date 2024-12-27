@@ -1,5 +1,5 @@
 import networkx as nx
-import _pickle as pickle
+import pickle
 import warnings
 import pandas as pd
 from pathlib import Path
@@ -101,5 +101,5 @@ class CollectionDiGraphs():
 
     def save_object(self, filename, path_prefix = ''):
         with open(Path(path_prefix) / Path(filename+'._pickle'), 'wb') as outp:
-            pickle.dump(self, outp, -1)
+            pickle.dump(self, outp, protocol=pickle.HIGHEST_PROTOCOL)
         self.df.to_csv(filename+'.csv')

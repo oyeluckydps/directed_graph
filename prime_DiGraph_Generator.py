@@ -1,5 +1,5 @@
 import networkx as nx
-import pickle
+from pickle_large_objects import StreamingPickler
 from copy import deepcopy
 from itertools import product
 from pathlib import Path
@@ -13,10 +13,7 @@ Nodes2_Prime1.add_edges_from([[1, 2], [2, 1]])
 Nodes2_Prime1 = Nodes2_Prime1.normalize()
 
 
-
-
-
-def find_primes(DG, already_checked_cdg = None):
+def find_primes(DG, already_checked_cdg=None):
     if already_checked_cdg is None:
         already_checked_cdg = cdg.CollectionDiGraphs()
     if not DG.is_strongly_connected:
@@ -37,7 +34,8 @@ def find_primes(DG, already_checked_cdg = None):
     return (all_primes, already_checked_cdg)
 
 
-def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphism = True, check_primality = True, reduce_to_primes = True):
+def add_a_node_all_possibilities(DG, already_checked_cdg=None, check_isomorphism=True, check_primality=True,
+                                 reduce_to_primes=True):
     '''
     :param DG: Directed graph to which a node is to be added
     :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
@@ -67,7 +65,7 @@ def add_a_node_all_possibilities(DG, already_checked_cdg = None, check_isomorphi
     return all_DGs, already_checked_cdg
 
 
-def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism = True):
+def optimized_prime_extension(DG, already_checked_cdg=None, check_isomorphism=True):
     '''
     :param DG: Directed graph to which a node is to be added
     :param check_isomorphism: If the generated DGs need to be checked for isomorphism.
@@ -82,7 +80,7 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
             with time_block("optimized_prime_extension: Preparation"):
                 DG_temp = edg.DiGraph(DG)
                 DG_temp.add_edges_from([[in_edge_node, num_nodes], [num_nodes, out_edge_node]])
-            if DG_temp.has_edge(in_edge_node, out_edge_node):      # An edge is bifurcated to add a new node.
+            if DG_temp.has_edge(in_edge_node, out_edge_node):  # An edge is bifurcated to add a new node.
                 DG_temp.remove_edge(in_edge_node, out_edge_node)
                 if check_isomorphism and already_checked_cdg.isomorphic_graph_exists(DG_temp):
                     continue
@@ -104,7 +102,8 @@ def optimized_prime_extension(DG, already_checked_cdg = None, check_isomorphism 
     return all_DGs, already_checked_cdg
 
 
-def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg = None, check_isomorphism = True, check_primality = True, reduce_to_primes = True):
+def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg=None, check_isomorphism=True,
+                                    check_primality=True, reduce_to_primes=True):
     '''
     :param lower_DG: A Directed graph
     :param higher_DG: Another Directed graph
@@ -118,8 +117,8 @@ def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg = N
         already_checked_cdg = deepcopy(all_DGs)
     higher_DG = higher_DG.normalize()
     higher_DG_copy = edg.DiGraph(higher_DG)
-    higher_DG_copy = nx.relabel_nodes(higher_DG_copy, {i:j for i,j in enumerate(list(range(lower_DG.number_of_nodes(),
-                                        lower_DG.number_of_nodes()+higher_DG_copy.number_of_nodes())))})
+    higher_DG_copy = nx.relabel_nodes(higher_DG_copy, {i: j for i, j in enumerate(list(range(lower_DG.number_of_nodes(),
+                                                                                             lower_DG.number_of_nodes() + higher_DG_copy.number_of_nodes())))})
     l_h_nexus_nodes_for_connection_all_possibilities = product(
         product(lower_DG.nodes, lower_DG.nodes),
         product(higher_DG_copy.nodes, higher_DG_copy.nodes)
@@ -142,13 +141,13 @@ def connect_nexus_all_possibilities(lower_DG, higher_DG, already_checked_cdg = N
 
 
 class primeDiGraphGenerator():
-    def __init__(self, name, path_prefix = ''):
+    def __init__(self, name, path_prefix=''):
         self.path_prefix = path_prefix
         self.name = name
         try:
-            with open(Path(path_prefix) / Path(self.name + '._pickle'), 'rb') as inp:
-                self.saved_data_filename = pickle.load(inp)
-                self.highest_prime_computed = pickle.load(inp)
+            data = StreamingPickler.load_in_chunks(Path(path_prefix) / Path(self.name + '._pickle'))
+            self.saved_data_filename = data["filename"]
+            self.highest_prime_computed = data["highest_prime_computed"]
         except FileNotFoundError:
             self.saved_data_filename = None
             self.cdg = cdg.CollectionDiGraphs()
@@ -156,18 +155,14 @@ class primeDiGraphGenerator():
             self.highest_prime_computed = 2
         if self.saved_data_filename is not None:
             try:
-                with open(Path(path_prefix) / Path(self.saved_data_filename + 'CDG._pickle'), 'rb') as inp:
-                    self.cdg = pickle.load(inp)
+                self.cdg = StreamingPickler.load_in_chunks(Path(path_prefix) / Path(self.saved_data_filename + 'CDG._pickle'))
             except:
-                raise('Error in loading data!')
+                raise ('Error in loading data!')
 
-
-    def save_data(self, cdg_filename, path_prefix = ''):
+    def save_data(self, cdg_filename, path_prefix=''):
         self.cdg.save_object(cdg_filename + 'CDG', path_prefix=path_prefix)
-        with open(Path(path_prefix)/Path(self.name+'._pickle'), 'wb') as outp:
-            pickle.dump(cdg_filename, outp, protocol=pickle.HIGHEST_PROTOCOL)
-            pickle.dump(self.highest_prime_computed, outp, protocol=pickle.HIGHEST_PROTOCOL)
-
+        data = {'filename': cdg_filename, 'highest_prime_computed': self.highest_prime_computed}
+        StreamingPickler.save_in_chunks(data, Path(path_prefix) / Path(self.name + '._pickle'))
 
     def compute_next_primes(self):
         prime_to_compute = self.highest_prime_computed + 1
@@ -176,10 +171,12 @@ class primeDiGraphGenerator():
         all_computed_isomorphs = cdg.CollectionDiGraphs()
         tot_highest_curr_primes = len(highest_current_primes)
         for i, a_highest_prime in enumerate(highest_current_primes):
-            print(str(i+1) + '/' + str(tot_highest_curr_primes), end=':\t')
+            print(str(i + 1) + '/' + str(tot_highest_curr_primes), end=':\t')
             with time_block("compute_next_prime: "):
-                computed_primes, all_computed_isomorphs = optimized_prime_extension(a_highest_prime, all_computed_isomorphs)
-            print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
+                computed_primes, all_computed_isomorphs = optimized_prime_extension(a_highest_prime,
+                                                                                    all_computed_isomorphs)
+            print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ",
+                  str(len(all_computed_isomorphs.DGs)))
             next_primes.add_DGs(computed_primes.DGs)
         self.highest_prime_computed = prime_to_compute
         self.cdg.add_DGs(next_primes.DGs)
@@ -192,11 +189,14 @@ class primeDiGraphGenerator():
         '''
         current_highest_computed = self.highest_prime_computed
         prime_to_compute = current_highest_computed
-        computations_req = {(1,current_highest_computed): self.cdg.count_of_computed_DGs(current_highest_computed)*(current_highest_computed**2)}
-        for smaller_nexus in range(2, prime_to_compute//2+1):
-            larger_nexus = prime_to_compute-smaller_nexus
-            computations_req[(smaller_nexus,larger_nexus)] = smaller_nexus*smaller_nexus*larger_nexus*larger_nexus* \
-                    self.cdg.count_of_computed_DGs(smaller_nexus)*self.cdg.count_of_computed_DGs(larger_nexus)
+        computations_req = {(1, current_highest_computed): self.cdg.count_of_computed_DGs(current_highest_computed) * (
+                    current_highest_computed ** 2)}
+        for smaller_nexus in range(2, prime_to_compute // 2 + 1):
+            larger_nexus = prime_to_compute - smaller_nexus
+            computations_req[
+                (smaller_nexus, larger_nexus)] = smaller_nexus * smaller_nexus * larger_nexus * larger_nexus * \
+                                                 self.cdg.count_of_computed_DGs(
+                                                     smaller_nexus) * self.cdg.count_of_computed_DGs(larger_nexus)
         print(computations_req)
         min_combo = min(computations_req, key=computations_req.get)
         print("Minimum computation required for: ", min_combo)
@@ -214,8 +214,10 @@ class primeDiGraphGenerator():
         # total_nexus_combos = len(list(l_h_nexus))
         for a_l_h_prime in l_h_nexus:
             # print(str(i+1) + '/' + str(total_nexus_combos), end=':\t')
-            computed_primes, all_computed_isomorphs = connect_nexus_all_possibilities(*a_l_h_prime, all_computed_isomorphs)
-            print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ", str(len(all_computed_isomorphs.DGs)))
+            computed_primes, all_computed_isomorphs = connect_nexus_all_possibilities(*a_l_h_prime,
+                                                                                      all_computed_isomorphs)
+            print("New Primes: ", str(len(computed_primes.DGs)), ",\t Total isomorphs checked so far: ",
+                  str(len(all_computed_isomorphs.DGs)))
             next_primes.add_DGs(computed_primes.DGs)
         self.highest_prime_computed = prime_to_compute
         self.cdg.add_DGs(next_primes.DGs)

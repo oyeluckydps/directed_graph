@@ -1,5 +1,5 @@
 import networkx as nx
-import pickle
+from pickle_large_objects import StreamingPickler
 import warnings
 import pandas as pd
 from pathlib import Path
@@ -19,13 +19,11 @@ def indices(lst, element):
 
 def load_object(filename, number_of_objects = 1):
     if number_of_objects == 1:
-        with open(filename+'._pickle', 'rb') as inp:
-            return pickle.load(inp)
+        return StreamingPickler.load_in_chunks(filename+'._pickle')
     else:
         object_list = []
-        with open(filename, 'rb') as inp:
-            for i in range(number_of_objects):
-                object_list.append(pickle.load(inp))
+        for i in range(number_of_objects):
+            object_list.append(StreamingPickler.load_in_chunks(filename))
         return object_list
 
 class CollectionDiGraphs():
@@ -44,13 +42,22 @@ class CollectionDiGraphs():
     @property
     def df(self):
         '''
-        Make a df out of self.DGs here!
-        :return:
+        Make a df out of self.DGs using vectorized operations
+        :return: pandas DataFrame containing graph information
         '''
-        df = pd.DataFrame(columns= ['isomorphic_hash', 'number_of_nodes', 'number_of_edges', 'is_strongly_connected', 'is_prime', 'adj_', 'DiGraph'])
-        for (hash, n_nodes, DG) in zip(self.DG_isophorm_hash, self.number_of_nodes, self.DGs):
-            df.loc[len(df.index)] = [hash, n_nodes, DG.number_of_edges(), DG.is_strongly_connected, DG.is_prime, DG.adj_, DG]
-        return df
+        # Create a dictionary of lists for all columns
+        data = {
+            'isomorphic_hash': self.DG_isophorm_hash,
+            'number_of_nodes': self.number_of_nodes,
+            'number_of_edges': [DG.number_of_edges() for DG in self.DGs],
+            'is_strongly_connected': [DG.is_strongly_connected for DG in self.DGs],
+            'is_prime': [DG.is_prime for DG in self.DGs],
+            'adj_': [DG.adj_ for DG in self.DGs],
+            'DiGraph': self.DGs
+        }
+
+        # Create DataFrame in one go
+        return pd.DataFrame(data)
 
     def add_DGs(self, DGs, normalize = False, check_against_isomorphism = False):
         for DG in DGs:
@@ -100,6 +107,5 @@ class CollectionDiGraphs():
         return False
 
     def save_object(self, filename, path_prefix = ''):
-        with open(Path(path_prefix) / Path(filename+'._pickle'), 'wb') as outp:
-            pickle.dump(self, outp, protocol=pickle.HIGHEST_PROTOCOL)
+        StreamingPickler.save_in_chunks(self, Path(path_prefix) / Path(filename+'._pickle'))
         self.df.to_csv(filename+'.csv')

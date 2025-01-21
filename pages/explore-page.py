@@ -9,7 +9,7 @@ from utils import graph_stylesheet, generate_elements_from_graph
 register_page(__name__, path='/explore')
 
 # Load DataFrame
-filename = 'optimized_isomorphic_hash'
+filename = 'consolidated'
 with open(Path(filename + 'CDG._pickle'), 'rb') as inp:
     cdg = pickle.load(inp)
 df = pd.DataFrame(cdg.df)

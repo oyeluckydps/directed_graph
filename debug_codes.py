@@ -63,7 +63,7 @@ def cdg_handling():
     print(CDG3_prime_all_reloaded.DGs)
 
 def pdgg_handling():
-    filename = 'consolidated'
+    filename = 'consolidated2'
     for i in range(3,16):
         _6nodes = pdgg.primeDiGraphGenerator(filename)
         print('Computing for ' + str(i) + ' nodes.')

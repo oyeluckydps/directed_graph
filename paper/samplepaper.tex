@@ -64,7 +64,6 @@ A directed graph is strongly connected if there exists a path between any pair o
 
 \subsection{Edge-Criticality of a Strongly Connected Digraph}
 % To develop the algortihm for construction of all edge-critical strongly connected digraphs, we first need an algorithm to test the edge-criticality of a strongly connected digraph. The psuedocode and explanation of this algorithm is provided below. Note that it is a trivial extension of the Tarjan algorithm.
- To test if a strongly connected digraph is edge-critical, Tarjan algorithm is employed repetitively with removal of an edge with replacement from the digraph. If the edge-removed digraph remains strongly connected, then the original digraph is not edge-critical. A pseudo-code for this algorithm is provided below.
 
 \begin{algorithm}
 \caption{Test Edge-Criticality}
@@ -84,15 +83,11 @@ A directed graph is strongly connected if there exists a path between any pair o
 \RETURN $G$ is edge-critical
 \end{algorithmic}
 \end{algorithm}
+ 
+ To test if a strongly connected digraph is edge-critical, Tarjan algorithm is employed repetitively with removal of an edge with replacement from the digraph. If the edge-removed digraph remains strongly connected, then the original digraph is not edge-critical. A pseudo-code for this algorithm is provided below.
 
 \subsection{Construction of All N+1 Nodes Edge-Critical Strongly Connected Digraphs}
 % Now we propose the main algorithm for the construction of all edge-critical strongly connected digraphs of N+1 nodes from a set of all such graphs of N nodes. 
-Let us denote the set of all edge-critical strongly connected digraphs with N nodes as $\mathcal{P}_N$. We initiate an empty set $\mathcal{Q}$ to store the constructed digraphs with N+1 nodes. A digraph $\mathcal{G}$ is popped from $\mathcal{P}_N$ and an unconnected node $\mathcal{V}_{new}$ is added to the digraph. A set $\mathcal{L = }Nodes({G}) {\times} Nodes ({G})$ of all possible pairs of nodes is constructed. 
-
-Iteratively, a pair (a, b) is popped from the set $\mathcal{L}$. If $\mathcal (a,b) \in Edge({G})$, then the edge (a,b) is removed and edges (a, $\mathcal{V}_{new}$) and ($\mathcal{V}_{new}$, b) are added to construct $\mathcal{G}_{(a, b)}$, an edge-critical strongly connected digraph of N+1 edges. If this graph and its isomorphs are not a member of $\mathcal{Q}$, then the graph is added to the set $\mathcal{Q}$.
-
-If $\mathcal (a,b) \notin Edge({G})$, then the edges (a, $\mathcal{V}_{new}$) and ($\mathcal{V}_{new}$, b) are added and the resulting graph is checked for edge-criticality. If this graph is edge-critical and neither the graph nor its isomorphs are a member of $\mathcal{Q}$, then the graph is added to the set $\mathcal{Q}$. A pseudo-code for this algorithm is provided below.
-
 
 \begin{algorithm}
 \caption{Construct Edge-Critical Strongly Connected Digraphs}
@@ -121,6 +116,12 @@ If $\mathcal (a,b) \notin Edge({G})$, then the edges (a, $\mathcal{V}_{new}$) an
 \RETURN $\mathcal{Q}$
 \end{algorithmic}
 \end{algorithm}
+
+Let us denote the set of all edge-critical strongly connected digraphs with N nodes as $\mathcal{P}_N$. We initiate an empty set $\mathcal{Q}$ to store the constructed digraphs with N+1 nodes. A digraph $\mathcal{G}$ is popped from $\mathcal{P}_N$ and an unconnected node $\mathcal{V}_{new}$ is added to the digraph. A set $\mathcal{L = }Nodes({G}) {\times} Nodes ({G})$ of all possible pairs of nodes is constructed. 
+
+Iteratively, a pair (a, b) is popped from the set $\mathcal{L}$. If $\mathcal (a,b) \in Edge({G})$, then the edge (a,b) is removed and edges (a, $\mathcal{V}_{new}$) and ($\mathcal{V}_{new}$, b) are added to construct $\mathcal{G}_{(a, b)}$, an edge-critical strongly connected digraph of N+1 edges. If this graph and its isomorphs are not a member of $\mathcal{Q}$, then the graph is added to the set $\mathcal{Q}$.
+
+If $\mathcal (a,b) \notin Edge({G})$, then the edges (a, $\mathcal{V}_{new}$) and ($\mathcal{V}_{new}$, b) are added and the resulting graph is checked for edge-criticality. If this graph is edge-critical and neither the graph nor its isomorphs are a member of $\mathcal{Q}$, then the graph is added to the set $\mathcal{Q}$. A pseudo-code for this algorithm is provided below.
 
 
 % Then in your document:
@@ -165,46 +166,97 @@ If $\mathcal (a,b) \notin Edge({G})$, then the edges (a, $\mathcal{V}_{new}$) an
 The correctness of edge-criticality algorithm can be directly verified using the definition of an edge-critical digraph. A strongly connected digraph is not edge-critical if it maintains strong connectivity after the removal of any single edge. Conversely, if the removal of any edge destroys the strong connectivity of the digraph, then the digraph is edge-critical. The algorithm directly leads to this definition.
 
 \subsection{Correctness of the Construction Algorithm}
-In this section, we prove that any digraph in the set $\mathcal{Q}$ is necessarily edge-critical strongly connected digraph. We proceed by proving two theorems that correspond to  the scenarios, $(a, b) \notin \text{Edge}(\mathcal{G})$ and $(a, b) \in \text{Edge}(\mathcal{G})$. Throughout the proof, we use the following notations. $\mathcal{V} = \text{Nodes}(G)$; $\mathcal{W} = \text{Nodes}(G_{(a,b)})$ i.e., $\mathcal{W} = \mathcal{V} \cup \{\mathcal{V}_{\text{new}}\}$; $e_{in} = edge (a, \mathcal{V}_{\text{new}})$; $e_{out} = edge (\mathcal{V}_{\text{new}}, b)$; and $e_{-} = edge (a, b)$.
+In this section, we prove that any digraph in the set $\mathcal{Q}$ is necessarily edge-critical strongly connected digraph. We proceed by proving two theorems that correspond to  the scenarios, $(a, b) \notin \text{Edge}(\mathcal{G})$ and $(a, b) \in \text{Edge}(\mathcal{G})$. 
+
+\vspace{0.5em}
+\noindent We use these notations and description of a digraph $\mathcal{G}_{(a,b)}$ for the following theorems and the proofs.
+
+\begin{align*}
+    &\mathcal{V} = Nodes(\mathcal{G}); \\
+    &e_{in} = edge (a, \mathcal{V}_{\text{new}}); \\
+    &e_{out} = edge (\mathcal{V}_{\text{new}}, b); \\
+    &Nodes(\mathcal{G}_{(a,b)}) = \mathcal{V} \cup \mathcal{V}_{\text{new}} = \mathcal{W}; \\
+    &Edges(\mathcal{G}_{(a,b)}) = Edges(\mathcal{G}) \cup e_{in} \cup e_{out}; \\
+\end{align*}
 
 \begin{theorem}
-If $\mathcal{G}$ is an edge-critical strongly connected digraph with nodes a and b such that (a, b) $\notin$ Edges($\mathcal{G}$) then the graph $\mathcal{G}_{(a,b)}$ formed by extending $\mathcal{G}$ such that Nodes($\mathcal{G}_{(a, b)}$) = Nodes($\mathcal{G}$) $\cup$ $\mathcal{V}_{new}$ and Edges($\mathcal{G}_{(a, b)}$) = Edges($\mathcal{G}$) $\cup$ (a, $\mathcal{V}_{new}$) $\cup$ ($\mathcal{V}_{new}$, b) is a strongly connected digraph.
+If $\mathcal{G}$ is an edge-critical strongly connected digraph with nodes a and b such that (a, b) $\notin$ Edges($\mathcal{G}$) then the graph $\mathcal{G}_{(a,b)}$ is a strongly connected digraph.
 \end{theorem}
 
 \begin{proof}
 We observe that there exists a path from any node in set $\mathcal{V}$ to any other node in the same set because the original graph $\mathcal{G}$ is strongly connected. $a \in \mathcal{V}$, $b \in \mathcal{V}$, and there exists a path from $\mathcal{V}_{\text{new}}$ to the node $b$ and from the node $a$ to node $\mathcal{V}_{\text{new}}$. Thus, there must exist a path from $\mathcal{V}_{\text{new}}$ to any node in $\mathcal{V}$, from any node in $\mathcal{V}$ to $\mathcal{V}_{\text{new}}$, and from $\mathcal{V}_{\text{new}}$ to $\mathcal{V}_{\text{new}}$. So, there exists a path from any node in $\mathcal{W}$ to any other node in the same set. Hence, $\mathcal{G}_{(a,b)}$ is strongly connected.
+\end{proof}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{fig2.png}
+    \caption{Transformation of a edge-critical strongly connected digraph $\mathcal{G}$ to a strongly connected digraph $\mathcal{G}_{(a,b)}$ when (a, b) $\notin$ Edges($\mathcal{G}$).}
+    \label{fig:fig2}
+\end{figure}
+
+\noindent\textbf{Note:} The digraph $\mathcal{G}_{(a,b)}$ is not necessarily edge-critical and therefore we require to check the edge-criticality explicitly in the algorithm for $(a, b) \notin \text{Edges}(\mathcal{G})$ scenario.
 
 \vspace{0.5em}
-\noindent\textbf{Note:} The digraph $\mathcal{G}_{(a,b)}$ is not necessarily edge-critical and therefore we require to check the edge-criticality explicitly in the algorithm for $(a, b) \notin \text{Edges}(\mathcal{G})$ scenario.
-\end{proof}
+\noindent In addition we use these notations and description of a digraph $\mathcal{G'}_{(a,b)}$ for the next theorem and its proof.
+\begin{align*}
+    &e_{-} = edge (a, b); \\
+    &Nodes(\mathcal{G'}_{(a,b)}) = Nodes(\mathcal{G}_{(a,b)}); \\
+    &Edges(\mathcal{G'}_{(a,b)}) = Edges(\mathcal{G}_{(a,b)}) \setminus e_{-}.
+\end{align*}
 
 \begin{theorem}
-If $\mathcal{G}$ is an edge-critical strongly connected digraph with nodes a and b such that (a, b) $\in$ Edges($\mathcal{G}$) then the graph $\mathcal{G}_{(a,b)}$ formed by modifying $\mathcal{G}$ such that Nodes($\mathcal{G}_{(a, b)}$) = Nodes($\mathcal{G}$) $\cup$ $\mathcal{V}_{new}$ and Edges($\mathcal{G}_{(a, b)}$) = (Edges($\mathcal{G}$) $\setminus$ (a, b)) $\cup$ (a, $\mathcal{V}_{new}$) $\cup$ ($\mathcal{V}_{new}$, b) is also an edge-critical strongly connected digraph.
+If $\mathcal{G}$ is an edge-critical strongly connected digraph with nodes a and b such that (a, b) $\in$ Edges($\mathcal{G}$) then the graph $\mathcal{G'}_{(a,b)}$ is also an edge-critical strongly connected digraph.
 \end{theorem}
 
-In this scenario, the edge (a, b) is replaced by two edges $e_{in}$ and $e_{out}$ preserving the connectivity from node a to b. 
+In this scenario, the edge $e_{-} = (a, b)$ is replaced by two edges $e_{in}$ and $e_{out}$ preserving the connectivity from node a to b. 
 
 \begin{proof}
-As the original graph $\mathcal{G}$ was strongly connected, there must exist a path from any node in $\mathcal{V}$ to any other node in the same set on graph $\mathcal{G}_{(a, b)}$. If the path contained edge $e_{-}$ on $\mathcal{G}$ then it would instead contain $e_{in}$ and $e_{out}$ on $\mathcal{G}_{(a, b)}$. Also there exists a path from from $\mathcal{V}_{\text{new}}$ to the node b and from the node a to node $\mathcal{V}_{\text{new}}$, so there exists a path from $\mathcal{V}_{\text{new}}$ to any node in $\mathcal{V}$ and from any node in $\mathcal{V}$ to $\mathcal{V}_{\text{new}}$. Furthermore, the path $e_{out} \cup Path(b, a) \cup e_{in}$ connects $\mathcal{V}_{\text{new}}$ to itself. So, there exists a path from any node in $\mathcal{W}$ to another node in the set. Hence, $\mathcal{G}_{(a, b)}$ is strongly connected.
+As the original graph $\mathcal{G}$ was strongly connected, there must exist a path from any node in $\mathcal{V}$ to any other node in the same set on graph $\mathcal{G'}_{(a, b)}$. If the path contained edge $e_{-}$ on $\mathcal{G}$ then it would instead contain $e_{in}$ and $e_{out}$ on $\mathcal{G}_{(a, b)}$. Also there exists a path from from $\mathcal{V}_{\text{new}}$ to the node b and from the node a to node $\mathcal{V}_{\text{new}}$, so there must exist a path from $\mathcal{V}_{\text{new}}$ to any node in $\mathcal{V}$ and from any node in $\mathcal{V}$ to $\mathcal{V}_{\text{new}}$. Furthermore, the path $e_{out} \cup Path(b, a) \cup e_{in}$ connects $\mathcal{V}_{\text{new}}$ to itself. So, there exists a path from any node in $\mathcal{W}$ to another node in the set. Hence, $\mathcal{G'}_{(a, b)}$ is strongly connected.
 
-If the edge $e_{in}$ is removed, then there doesn't exist any path from the node a to node $\mathcal{V}_{\text{new}}$. Similarly, if the edge $e_{out}$ is removed, then there doesn't exist any path from the node $\mathcal{V}_{\text{new}}$ to node b. Thus with removal of either of these edges, the graph $\mathcal{G}_{(a, b)}$ ceases to be strongly connected. 
+If the edge $e_{in}$ is removed, then there doesn't exist any path from the node a to node $\mathcal{V}_{\text{new}}$. Similarly, if the edge $e_{out}$ is removed, then there doesn't exist any path from the node $\mathcal{V}_{\text{new}}$ to node b. Thus with removal of either of these edges, the graph $\mathcal{G'}_{(a, b)}$ ceases to be strongly connected. 
 
-The graph $\mathcal{G}$ was edge-critical. If any edge $e = (x, y) \neq (a, b)$ is removed from the graph $\mathcal{G}$, then there exists no path from the node x to the node y. This must be the case otherwise the edge e would be redundant. Now consider the edge e on the new graph $\mathcal{G}_{(a, b)}$. Here too, if the edge e is removed, there must not exist any path from the node x to the node y because if such a path existed on $\mathcal{G}_{(a, b)}$, then the path would exist on $\mathcal{G}$ too with possible replacement of $\{e_{in}\} \cup \{e_{out}\}$ with $\{e_{-}\}$. Thus removal of any edge from the graph $\mathcal{G}_{(a, b)}$, dissolves strong connectedness. Hence, $\mathcal{G}_{(a, b)}$ is edge-critical strongly connected digraph.
+The graph $\mathcal{G}$ was edge-critical. If any edge $e = (x, y) \neq e_{-}$ is removed from the graph $\mathcal{G}$, then there exists no path from the node x to the node y on the graph $\mathcal{G}$. This must be the case otherwise the edge $e$ would be redundant. Now consider the edge $e$ on the new graph $\mathcal{G'}_{(a, b)}$. Here too, if the edge $e$ is removed, there must not exist any path from the node $x$ to the node $y$ because if such a path existed on $\mathcal{G'}_{(a, b)}$, then the path would exist on $\mathcal{G}$ too with possible replacement of $\{e_{in}\} \cup \{e_{out}\}$ by $\{e_{-}\}$. Thus removal of any edge from the graph $\mathcal{G'}_{(a, b)}$, dissolves its strong connectedness. Hence, $\mathcal{G'}_{(a, b)}$ is edge-critical strongly connected digraph.
 \end{proof}
 
-\noindent With these theorems, the correctness of algorithm is established i.e. each element of the output set $\mathcal{Q}$ is edge-critical strongly connected digraph. We now proceed to prove the completeness of the algorithm i.e. the set $\mathcal{Q}$ contains all possible edge-critical strongly connected digraph of N+1 nodes, if it receives a set of all possible edge-critical strongly connected digraph of N ndoes as its input.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.7\textwidth]{fig3.png}
+    \caption{Transformation of a edge-critical strongly connected digraph $\mathcal{G}$ to another edge-critical strongly connected digraph $\mathcal{G'}_{(a,b)}$ when (a, b) $\in$ Edges($\mathcal{G}$).}
+    \label{fig:fig3}
+\end{figure}
+
+\noindent With these theorems, the correctness of algorithm is established i.e. each element of the output set $\mathcal{Q}$ is edge-critical strongly connected digraph. Now, we proceed to prove the completeness of the algorithm i.e. the set $\mathcal{Q}$ contains all possible edge-critical strongly connected digraph of N+1 nodes, if it receives a set of all possible edge-critical strongly connected digraph of N ndoes as its input.
 
 \subsection{Reduction of Edge-Critical Strongly Connected Digraphs to Smaller Node Counts}
 % Reduction of an edge-critical strongly connected digraph with N+1 nodes and a node of degree 2 to an edge-critical strongly connected digraph with N nodes.
 
+% For the following theorem and its proof, we assume $\mathcal{G}$ to be an edge-critical strongly connected graph with a node $V_{red}$ having one in-edge $e_{in}$ and one out-edge $e_{out}$ only. The node $a$ is pre-node of $e_{in}$ and the node $b$ is the post-node of $e_{out}$.
 \begin{theorem}
-If an edge-critical strongly connected digraph has a node $\mathcal{V}_{red}$ with one in-edge ($e_{in}$) and one out-edge ($e_{out}$) only, then the digraph can be reduced to another edge-critical strongly connected digraph of one lesser node by either removing the node $\mathcal{V}_{red}$ and the edges $e_{in}$ and $e_{out}$ or by removing the node $\mathcal{V}_{red}$, removing the edges $e_{in}$ and $e_{out}$, and adding an edge from pre-node of $e_{in}$ to the post node of $e_{out}$.
+If an edge-critical strongly connected digraph $\mathcal{G}$ has a node $V_{red}$ with one in-edge ($e_{in}$) and one out-edge ($e_{out}$) only, then the digraph can be reduced to another edge-critical strongly connected digraph with one fewer node by performing one of the following operations:
+\begin{enumerate}
+    \item Removing the node $V_{red}$ and the edges $e_{in}$ and $e_{out}$; or
+    \item Removing the node $V_{red}$, removing the edges $e_{in}$ and $e_{out}$, and adding an edge from the pre-node of $e_{in}$ to the post-node of $e_{out}$.
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}
-Proofs, examples, and remarks have the initial word in italics,
-while the following text appears in normal font.
+Let us assume that the pre-node of $e_{in}$ is $a$ and the post-node of $e_{out}$ is $b$ on the graph $\mathcal{G}$. Now, we construct a graph $\mathcal{H}$ from the graph $\mathcal{G}$ by following the second operation i.e. removing the node $V_{red}$, removing the edges $e_{in}$ and $e_{out}$, and adding an edge $e = (a, b)$. Now let $\mathcal{V} = Nodes(\mathcal{G})$ and $\mathcal{W} = Nodes(\mathcal{H})$.
+
+The digraph $\mathcal{G}$ is strongly connected so it is possible to reach from any node in the set $\mathcal{V}$ to another node in the set on $\mathcal{G}$. Since $\mathcal{W} \subset \mathcal{V}$, a path exists from any node in $\mathcal{W}$ to another node in the set on the graph $\mathcal{H}$ with the possibility of including the edge $\{e\}$ in the path instead of $\{e_{in}\} \cup \{e_{out}\}$, if the latter is a component of the path on the graph $\mathcal{G}$. Thus, the graph $\mathcal{H}$ is strongly connected.
+
+The graph $\mathcal{G}$ is edge-critical. If any edge $e = (x, y)$ other than $e_{in}$ and $e_{out}$ is removed from the graph $\mathcal{G}$, then there exists no path from the node x to the node y on the graph $\mathcal{G}$. Now consider the edge $e$ on the graph $\mathcal{H}$. Here too, if the edge $e$ is removed, there must not exist any path from the node $x$ to the node $y$ because if such a path existed on $\mathcal{H}$, then the path would exist on $\mathcal{G}$ too with possible replacement of $\{e_{in}\} \cup \{e_{out}\}$ by $\{e\}$. Thus removal of any edge from the graph $\mathcal{H}$ except possibly $(a, b)$, dissolves its strong connectedness.
+
+Now, we construct a graph $\mathcal{H'}$ by removing the edge {e} from the graph $\mathcal{H}$. This construction corresponds to the first operation. If the graph $\mathcal{H'}$ is strongly connected then it is also edge-critical following the above-mentioned argument. However, if it is not strongly connected, then $\mathcal{H}$ is necessarily edge-critical as removal of any of its edge including edge $e$ dissolves the strong connectedness of the graph. Hence, either the graph $\mathcal{H'}$ composed by first operation or the graph $\mathcal{H}$ composed by second operation must be an edge-critical strongly connected digraph.
 \end{proof}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{fig4_b.png}
+    \caption{Demonstration of Operation 1 and Operation 2 on a edge-critical strongly connected digraph $\mathcal{G}$ resulting into digraphs $\mathcal{H'}$ and $\mathcal{H}$ respectively. Either $\mathcal{H'}$ or $\mathcal{H}$ is also edge-critical strongly connected digraph.}
+    \label{fig:fig4}
+\end{figure}
+
+\noindent We shall now prove the most important theorem regarding edge-critical strongly connected digraphs.
 
 \subsection{Completeness of the Construction Algorithm}
 
@@ -230,7 +282,7 @@ We prove the theorem by assuming there exist an edge-critical strongly connected
 
 \subsubsection{Scenario 3: A leaf has one in-edge and two or more out-edges} We deconstruct this case too using the following logic to show that it is not possible.
 
-\subsubsection{Conclusion} We have shown that any of the possible scenarios for the leaf on the constructed spanning tree is infeasible. Thus, our assumption that there exists an edge-critical strongly connected digraph ($\mathcal{G}$) of N nodes, such that all its node have degree 3 or more must be incorrect.
+\subsubsection{Conclusion} We have shown that all of the possible scenarios for a leaf on the constructed spanning tree is infeasible. Thus, our assumption that there exists an edge-critical strongly connected digraph ($\mathcal{G}$) of N nodes, such that all its nodes have degree 3 or more is incorrect.
 \end{proof}
 
 

@@ -306,59 +306,58 @@ In the second case, it is evident that there exists a path $P_4$ from $A$ to $l$
 
 Since the base case is violated, we have proved that it is impossible for a leaf of the DAG to have two or more in-edges (irrespective of the count of out-edges) on the edge-critical strongly connected digraph $\mathcal{G}$.
 
-\subsubsection{Scenario 3: A leaf has one in-edge and one or more out-edges} Since, the first two scenarios are impossible all leafs on the DAG must have one in-edge and at least one-edge (apart from the out-edge that is part of DAG). Let's name the all leaf nodes as $l_1, l_2, ... , l_m$, their corresponding in-edges as $ein_1, ein_2, ... , ein_m$, the pre-nodes corresponding to these in-edges as $x_1, x_2, ... , x_m$. Also, let's name the out-edges as $eout_1, eout_2, ... , eout_m$, and the post-nodes corresponding to these out-edges as $y_1, y_2, ... , y_m$. Let $P_1, P_2, ... P_m$ be the paths from the leaf nodes $l_1, l_2, ..., l_m$ to the root node $A$ on the DAG.
+\subsubsection{Scenario 3: A leaf has one in-edge and one or more out-edges} Since, the first two scenarios are impossible all leafs on the DAG must have one in-edge and at least one-edge (apart from the out-edge that is part of DAG). Let's assume that there are a total of $m$ leafs and name them as $l_1, l_2, ... , l_m$, their corresponding in-edges as $ein_1, ein_2, ... , ein_m$, the pre-nodes corresponding to these in-edges as $x_1, x_2, ... , x_m$. Also, let's name the out-edges as $eout_1, eout_2, ... , eout_m$, and the post-nodes corresponding to these out-edges as $y_1, y_2, ... , y_m$. Let $P_1, P_2, ... P_m$ be the paths from the leaf nodes $l_1, l_2, ..., l_m$ to the root node $A$ on the DAG. Also, let $\mathcal{Z}_m = \{1, 2, ..., m\}$
 
-% Now, all paths from the node $A$ to node $l$ must contain the edge $e_1 = (x, l)$. If this isn't the case then consider the path - $P_1 = Path_{DAG}(x, A) \cup Path(A, l)$. $e_1 \notin P_1$ but $P_1$ is a path from $x$ to $l$ rendering $e_1$ redundant - a contradiction since $\mathcal{G}$ is an edge-critical strongly connected digraph.
+$\forall i \in \mathcal{Z}_m$ the path from any node (including the node $A$) to $l_i$  on $\mathcal{G}$ must contain the edge $ein_i$, since it is the only in-edge for the node $l_i$.
 
-% Also, all paths from node $A$ to $y$ must contain must contain the edge $e_2$. If this isn't the case then consider the path - $P_2 = Path_{DAG}(l, A) \cup Path(A, y)$. $e_2 \notin P_2$ but $P_2$ is a path from $l$ to $y$ rendering $e_2$ redundant - a contradiction since $\mathcal{G}$ is an edge-critical strongly connected digraph. It implies that the node $y$ must also be a lead on the DAG. If it 
+Let the node $y_i$ fall on path $P_j$ following some map from $\mathcal{Z}_m \rightarrow \mathcal{Z}_m$. Then, all paths from $A$ to $l_j$ must contain the edge $eout_i = (l_i, y_i)$, otherwise the path - $R_1 = Path_{DAG}(l_i, A) \cup Path(A, l_j) \cup Path_{DAG}(l_j, y_i)$ does not contain the edge $eout_i$ but connects the node $l_i$ to the node $y_i$ on $\mathcal{G}$, violating the edge-criticality of graph $\mathcal{G}$. For the corner condition $y_i = l_j$, the statements holds too.
 
-\subsubsection{Conclusion} We have shown that all of the possible scenarios for a leaf on the constructed spanning tree is infeasible. Thus, our assumption that there exists an edge-critical strongly connected digraph ($\mathcal{G}$) of N nodes, such that all its nodes have degree 3 or more is incorrect.
+So, we have essentially proved that the path $S = A \rightarrow l_1 \rightarrow y_1$ must lead to node $l_i$ such that $y_1 \in P_i$. The node $y_1 \notin P_1$ as there there exists a path from $l_1$ to any node in $P_1$. Moreover, this chain propagates to $y_i$, and $y_i \notin P_1$, $y_i \notin P_i$. This holds because the path - $R_2 = Path_{DAG}(l_i, A) \cup Path(A, l_a) \cup Path_{DAG}(l_a, y_i)$ for $l_a$ being a node on the path $S$, connects node $l_i$ to $y_i$ and it doesn't contain the edge $eout_i = (l_i, y_i)$ violating the edge-criticality of graph $\mathcal{G}$. Note the path $Path(A, l_a)$ in $R_2$ is contained in the path $S$. 
+
+Continuing the construction of the path $S = A \rightarrow l_1 \rightarrow y_1 \rightarrow l_i \rightarrow y_i \rightarrow l_j \rightarrow ... \rightarrow y_k \rightarrow l_{final}$ we observe that when all leaf nodes are visited, it is possible for the $y_{final}$ to not lie on any of the paths as all nodes must lie on at least one path. Thus, we have shown that it is impossible for all leaf nodes to have one in-edge and one or more out edge.
+
+\subsubsection{Summary} We have shown that none of the three scenarios for a leaf on the constructed spanning tree is feasible. Thus, our assumption that there exists an edge-critical strongly connected digraph ($\mathcal{G}$) of N nodes, such that all its nodes have degree 3 or more is incorrect. All edge-critical strongly connected digraph must contain a node of degree 2.
 \end{proof}
 
+\section{Results}
+The number of non-labeled edge-critical strongly connected digraphs grows quickly (beyond-polynomial) with the number of node N.
 
-\begin{credits}
-\subsubsection{\ackname} A bold run-in heading in small font size at the end of the paper is
-used for general acknowledgments, for example: This study was funded
-by X (grant number Y).
+\begin{table}
+\caption{Total Prime Digraphs by Number of Nodes.}\label{tab1}
+\centering
+\begin{tabular}{|c|c|}
+\hline
+Number of Nodes & Total Prime Digraphs \\
+\hline
+2 & 1 \\
+3 & 2 \\
+4 & 5 \\
+5 & 15 \\
+6 & 63 \\
+7 & 288 \\
+8 & 1526 \\
+9 & 8627 \\
+10 & 52021 \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsubsection{\discintname}
-It is now necessary to declare any competing interests or to specifically
-state that the authors have no competing interests. Please place the
-statement with a bold run-in heading in small font size beneath the
-(optional) acknowledgments\footnote{If EquinOCS, our proceedings submission
-system, is used, then the disclaimer can be provided directly in the system.},
-for example: The authors have no competing interests to declare that are
-relevant to the content of this article. Or: Author A has received research
-grants from Company W. Author B has received a speaker honorarium from
-Company X and owns stock in Company Y. Author C is a member of committee Z.
-\end{credits}
-%
-% ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-%
-% \bibliographystyle{splncs04}
-% \bibliography{mybibliography}
-%
+
 \begin{thebibliography}{8}
-\bibitem{ref_article1}
-Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
+\bibitem{ref_tarjan1972}
+Tarjan, R.E.: Depth-first search and linear graph algorithms. SIAM Journal on Computing \textbf{1}(2), 146--160 (1972)
+\bibitem{ref_graph_connectivity}
+Cormen, T.H., Leiserson, C.E., Rivest, R.L., Stein, C.: Introduction to Algorithms. 3rd edn. MIT Press, Cambridge (2009)
+\bibitem{ref_strongly_connected_components}
+Aho, A.V., Hopcroft, J.E., Ullman, J.D.: The Design and Analysis of Computer Algorithms. Addison-Wesley, Reading (1974)
+\bibitem{ref_minimal_strongly_connected}
+Eswaran, K.P., Tarjan, R.E.: Improved algorithms for finding minimal cycle bases. SIAM Journal on Computing \textbf{4}(4), 604--616 (1975)
+\bibitem{ref_digraph_connectivity_theory}
+Bang-Jensen, J., Gutin, G.: Digraphs: Theory, Algorithms and Applications. Springer Monographs in Mathematics, Berlin (2007)
+\bibitem{ref_algorithmic_graph_theory}
+Even, S.: Graph Algorithms. 2nd edn. Cambridge University Press, Cambridge (2011)
 
-\bibitem{ref_lncs1}
-Author, F., Author, S.: Title of a proceedings paper. In: Editor,
-F., Editor, S. (eds.) CONFERENCE 2016, LNCS, vol. 9999, pp. 1--13.
-Springer, Heidelberg (2016). \doi{10.10007/1234567890}
-
-\bibitem{ref_book1}
-Author, F., Author, S., Author, T.: Book title. 2nd edn. Publisher,
-Location (1999)
-
-\bibitem{ref_proc1}
-Author, A.-B.: Contribution title. In: 9th International Proceedings
-on Proceedings, pp. 1--2. Publisher, Location (2010)
-
-\bibitem{ref_url1}
-LNCS Homepage, \url{http://www.springer.com/lncs}, last accessed 2023/10/25
+\bibitem{ref_graph_theory_foundations}
+Diestel, R.: Graph Theory. 4th edn. Springer, Heidelberg (2010)
 \end{thebibliography}
 \end{document}
